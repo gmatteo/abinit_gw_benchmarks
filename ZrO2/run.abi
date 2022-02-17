@@ -7,50 +7,65 @@
 
 pseudos = "./Zr-sp.psp8, ./O.psp8"
 
-ndtset      4
+indata_prefix = "indata/"
+outdata_prefix = "outdata/"
+tmpdata_prefix = "tmpdata/"
+
+# SCF + NSCF steps
+#ndtset 2
+#jdtset 1 2  
+
+# Screening
+ndtset 1
+jdtset 3    
+
+# Self-energy
+#ndtset 1
+#jdtset 4 
 
 ############
 # Dataset 1
 ############
-# SCF-GS run 
-nband1  512
-tolvrs1 1.0e-10
-kptopt 1
+# SCF-GS run  with nkpt 29, nelect 24
+nband1  36
+tolvrs1 1.0e-8
+
 ############
 # Dataset 2
 ############
 # Definition of parameters for the calculation of the WFK file
-nband2     512       # Number of (occ and empty) bands to be computed
-nbdbuf2     20       # Do not apply the convergence criterium to the last 20 bands (faster)
+nband2     1048     # Number of (occ and empty) bands to be computed
+nbdbuf2     200     # Do not apply the convergence criterium to the last nbdbuf bands (faster)
 iscf2       -2
 getden2     1
-tolwfr2  1.0d-18     # Will stop when this tolerance is achieved 
+nstep2      1
+tolwfr2  1.0d-20    # Stop when this tolerance is achieved 
 
 ############
 # Dataset 3
 ############
 # Calculation of the screening (epsilon^-1 matrix)
-optdriver3  3        # Screening calculation
-getwfk3     2       # Obtain WFK file from previous dataset
-nband3      512       # Bands to be used in the screening calculation
+optdriver3  3      # Screening calculation
+getwfk3     2      # Obtain WFK file from previous dataset
+nband3      1024   # Bands to be used in the screening calculation
 ecuteps3    8      # Cut-off energy of the planewave set to represent the dielectric matrix. 
-                     # It is important to adjust this parameter.
+                   # It is important to adjust this parameter.
 
 ############
 # Dataset 4
 ############
 # Calculation of the Self-Energy matrix elements (GW corrections)
-optdriver4  4        # Self-Energy calculation
+optdriver4  4       # Self-Energy calculation
 getwfk4     2       # Obtain WFK file from dataset 1
 getscr4     3       # Obtain SCR file from previous dataset
-nband4      512       # Bands to be used in the Self-Energy calculation
-ecutsigx4   30.0     # Dimension of the G sum in Sigma_x. 
+nband4     1024     # Bands to be used in the Self-Energy calculation
+ecutsigx4   45.0    # Dimension of the G sum in Sigma_x. 
 
 nkptgw4      3       # number of k-point where to calculate the GW correction
 kptgw4               # k-points in reduced coordinates
             0.0  0.0  0.0 # Gamma point
             0.5  0.5  0.0 # X
-            0.5 0.0 0.0  #L
+            0.5 0.0 0.0   # L
 
 bdgw4       
 12 13
@@ -66,6 +81,7 @@ angdeg 60 60 60
 # Definition of the atom types
 ntypat  2         # There is only one type of atom
 znucl 40 8          
+
 # Definition of the atoms
 natom 3           # There are two atoms
 typat  1 2 2        # They both are of type 1, that is, Silicon.
@@ -77,20 +93,18 @@ xred              # Reduced coordinate of atoms
 
 
 # Definition of the k-point grid
-ngkpt   6 6 6 
+#ngkpt   6 6 6
+ngkpt   8 8 8
 nshiftk 1
 shiftk  0.0 0.0 0.0  # These shifts will be the same for all grids
         
 istwfk  *1         # This is mandatory in all the GW steps.
 
-
-
 #Definition of the planewave basis set
-ecut 30.0         # Maximal kinetic energy cut-off, in Hartree
+ecut 45.0         # Maximal kinetic energy cut-off, in Hartree
 
 #Definition of the SCF procedure
 nstep 150          # Maximal number of SCF cycles
 diemac 12.0       
-tolsym 1.0d-5
 timopt -1
 

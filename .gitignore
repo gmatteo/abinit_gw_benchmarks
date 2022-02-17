@@ -1,0 +1,7 @@
+indata/*
+tmpdata/*
+outdata/*
+run.abo*
+run.err
+run.log
+slurm-*
