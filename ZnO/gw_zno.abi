@@ -1,0 +1,98 @@
+# Crystalline ZnO structure (refer to green-x library for more information)
+# Calculation of the GW corrections
+# Dataset 1: ground state calculation to get the density
+# Dataset 2: NSCF run to produce the WFK file
+# Dataset 3: calculation of the screening (epsilon^-1 matrix for W)
+# Dataset 4: calculation of the Self-Energy matrix elements (GW corrections)
+
+pseudos = "./Zn-sp.psp8, ./O.psp8"
+
+ndtset    4
+#jdtset   1 2 3 4
+
+
+############
+# Dataset 1
+############
+# SCF-GS run
+nband1  80
+tolvrs1 1.0e-10
+
+############
+# Dataset 2
+############
+# Definition of parameters for the calculation of the WFK file
+nband2     2000      # Number of (occ and empty) bands to be computed
+nbdbuf2     20       # Do not apply the convergence criterium to the last 20 bands (faster)
+iscf2       -2
+getden2     1
+tolwfr2  1.0d-18     # Will stop when this tolerance is achieved
+
+############
+# Dataset 3
+############
+# Calculation of the screening (epsilon^-1 matrix)
+optdriver3  3       # Screening calculation
+getwfk3     2       # Obtain WFK file from previous dataset
+nband3      500     # Bands to be used in the screening calculation
+ecuteps3    4       # Cut-off energy of the planewave set to represent the dielectric matrix.
+                    # It is important to adjust this parameter.
+
+############
+# Dataset 4
+############
+# Calculation of the Self-Energy matrix elements (GW corrections)
+optdriver4  4        # Self-Energy calculation
+getwfk4   2       # Obtain WFK file from dataset 1
+getscr4   3       # Obtain SCR file from previous dataset
+nband4    500
+ecutsigx  40.0     # Dimension of the G sum in Sigma_x.
+                     # (the dimension in Sigma_c is controlled by ecuteps)
+nkptgw4      3       # number of k-point where to calculate the GW correction
+kptgw4               # k-points in reduced coordinates
+           0.0       0.0       0.0
+           1/3       1/3       0.0
+           0.5       0.0       0.0
+
+bdgw4
+26 27
+26 27
+26 27
+
+#nkptgw4      0       # number of k-point where to calculate the GW correction
+#gw_qprange 0
+
+#nband4 100
+# Data common to the three different datasets
+
+# Definition of the unit cell: fcc
+acell 3.24940000 3.24940000 5.20380000 Angstrom
+angdeg 90 90 120
+
+# Definition of the atom types
+ntypat 2
+znucl 30 8
+
+#Definition of the atoms
+natom 4
+typat 1 1 2 2
+ xred
+    1/3    2/3    0.0000000000
+    2/3    1/3    0.5000000000
+    1/3    2/3    0.3821000000
+    2/3    1/3    0.8821000000
+
+# Definition of the k-point grid
+ngkpt   8 8 5
+nshiftk 1
+shiftk  0.0 0.0 0.0
+
+#istwfk  *1         # This is mandatory in all the GW steps.
+
+# Definition of the planewave basis set (at convergence 16 Rydberg 8 Hartree)
+ecut 40.0          # Maximal kinetic energy cut-off, in Hartree
+
+# Definition of the SCF procedure
+nstep   200        # Maximal number of SCF cycles
+#toldfe  1.0d-6    # Will stop when this tolerance is achieved on total energy
+diemac  12.0
