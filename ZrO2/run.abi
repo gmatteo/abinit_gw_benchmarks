@@ -1,60 +1,76 @@
-# Crystalline ZrO2, A1 structure (refer to green-x library for more information)
-# Calculation of the GW corrections
+# Crystalline ZrO2, A1 structure 
 # Dataset 1: ground state calculation to get the density 
 # Dataset 2: NSCF run to produce the WFK file
 # Dataset 3: calculation of the screening (epsilon^-1 matrix for W)
 # Dataset 4: calculation of the Self-Energy matrix elements (GW corrections)
+# 
+# In this system, we have nelect 24 so 12 occupied bands (spin unpolarized)
 
-pseudos = "./Zr-sp.psp8, ./O.psp8"
-
-indata_prefix = "indata/"
-outdata_prefix = "outdata/"
-tmpdata_prefix = "tmpdata/"
-
-# SCF + NSCF steps
+# Uncomment the two lines below to perform the first two steps (SCF + NSCF)
+# This part is parallelized over nkpt 
 #ndtset 2
 #jdtset 1 2  
 
-# Screening
+# Uncomment the two lines below to perform the third step (Screening)
 ndtset 1
 jdtset 3    
 
-# Self-energy
+# Uncomment the two lines below to perform the fourth step (sigma)
 #ndtset 1
 #jdtset 4 
+
+# This is for the MPI-parallelization of the SCF + NSCF steps.
+# For optimal efficiency the number of MPI procs should be a multiple of the number of k-points nkpt.
+# but this quantity depends on ngkpt specified below.
+paral_kgb 1
+autoparal 1
+
+# Definition of the k-point grid for electrons.
+# Rougly speaking, GW computations scale with N_k^3 with N_k the total number of points in the mesh.
+# All the four steps must be done with the same value of ngkpt
+# Here I use even divisions so that I can run the last step without having to change kptgw.
+ngkpt   8 8 8    # nkpt 29
+#ngkpt  12 12 12
+nshiftk 1
+shiftk  0.0 0.0 0.0  
 
 ############
 # Dataset 1
 ############
-# SCF-GS run  with nkpt 29, nelect 24
+# SCF-GS run
 nband1  36
 tolvrs1 1.0e-8
 
 ############
-# Dataset 2
+# Dataset 2 (NSCF run to generate the WFK file with nband2 states, occ + empty)
 ############
-# Definition of parameters for the calculation of the WFK file
 nband2     1048     # Number of (occ and empty) bands to be computed
-nbdbuf2     200     # Do not apply the convergence criterium to the last nbdbuf bands (faster)
+#nbdbuf2     200     
 iscf2       -2
-getden2     1
-nstep2      1
-tolwfr2  1.0d-20    # Stop when this tolerance is achieved 
+getden2     -1
+tolwfr2  1.0d-20    
+nstep2      1       # Trick to reduce the number of steps in the NSCF solver.
+                    # Final results won't be physical but we don't waste time in dataset 2
 
 ############
 # Dataset 3
 ############
-# Calculation of the screening (epsilon^-1 matrix)
+# Calculation of the screening 
+# Note that nband3 cannot be greater than nband2
+# For optimal load balance (nband3 - nelect/2) should be divisible by nprocs
+#
 optdriver3  3      # Screening calculation
 getwfk3     2      # Obtain WFK file from previous dataset
 nband3      1024   # Bands to be used in the screening calculation
 ecuteps3    8      # Cut-off energy of the planewave set to represent the dielectric matrix. 
-                   # It is important to adjust this parameter.
+                   # This value has a **big impact** on cpu-time and memory.
 
 ############
 # Dataset 4
 ############
 # Calculation of the Self-Energy matrix elements (GW corrections)
+# nband4 cannot be greated than nband2
+# For optimal load balance nband4 should be divisible by nprocs
 optdriver4  4       # Self-Energy calculation
 getwfk4     2       # Obtain WFK file from dataset 1
 getscr4     3       # Obtain SCR file from previous dataset
@@ -62,7 +78,6 @@ nband4     1024     # Bands to be used in the Self-Energy calculation
 ecutsigx4   45.0    # Dimension of the G sum in Sigma_x. 
 
 nkptgw4      3       # number of k-point where to calculate the GW correction
-kptgw4               # k-points in reduced coordinates
             0.0  0.0  0.0 # Gamma point
             0.5  0.5  0.0 # X
             0.5 0.0 0.0   # L
@@ -89,14 +104,6 @@ xred              # Reduced coordinate of atoms
       0.0000000000E+00  0.0000000000E+00  0.0000000000E+00
       2.5000000000E-01  2.5000000000E-01  2.5000000000E-01
       7.5000000000E-01  7.5000000000E-01  7.5000000000E-01
-
-
-
-# Definition of the k-point grid
-#ngkpt   6 6 6
-ngkpt   8 8 8
-nshiftk 1
-shiftk  0.0 0.0 0.0  # These shifts will be the same for all grids
         
 istwfk  *1         # This is mandatory in all the GW steps.
 
@@ -108,3 +115,8 @@ nstep 150          # Maximal number of SCF cycles
 diemac 12.0       
 timopt -1
 
+pseudos = "./Zr-sp.psp8, ./O.psp8"
+
+indata_prefix = "indata/"
+outdata_prefix = "outdata/"
+tmpdata_prefix = "tmpdata/"

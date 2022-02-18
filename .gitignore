@@ -1,7 +1,8 @@
-indata/*
-tmpdata/*
-outdata/*
+indata/
+tmpdata/
+outdata/
 run.abo*
 run.err
 run.log
 slurm-*
+queue.*
