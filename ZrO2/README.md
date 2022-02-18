@@ -86,6 +86,9 @@ at runtime are expected to dominate, especially for large number of cores.
 
 Yet, one can use this input file to perform an initial POP analysis with a relatively small number of processors
 (let's say <~ 500) to detect non-scalable sections, bottlenecks and inefficiencies.
+I would suggest to focus more on the screening part as the sigma step for this system is relatively fast.
+The main issue in sigma is represented by the memory requirements as not all the datastructures are MPI-distributed.
 
-Once we have some results for these initial benchmark, we can discuss about the next steps.
+Once we have some results for these initial benchmark, we can discuss about the next steps and I can 
+provide input files for larger systems.
 

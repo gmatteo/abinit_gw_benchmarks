@@ -3,11 +3,11 @@
 #SBATCH --partition=batch
 #SBATCH --job-name=zro2
 ###SBATCH --ntasks=29
-##SBATCH --ntasks=24
-##SBATCH --ntasks=48
+###SBATCH --ntasks=24
+#SBATCH --ntasks=48
 ##SBATCH --ntasks=96
 ##SBATCH --ntasks=72
-#SBATCH --ntasks=128
+##SBATCH --ntasks=128
 ###SBATCH --ntasks=256
 ###SBATCH --ntasks=512
 #SBATCH --mem-per-cpu=4000

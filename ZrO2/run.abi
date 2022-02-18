@@ -8,16 +8,16 @@
 
 # Uncomment the two lines below to perform the first two steps (SCF + NSCF)
 # This part is parallelized over nkpt 
-ndtset 2
-jdtset 1 2  
+#ndtset 2
+#jdtset 1 2  
 
 # Uncomment the two lines below to perform the third step (Screening)
 #ndtset 1
 #jdtset 3    
 
 # Uncomment the two lines below to perform the fourth step (sigma)
-#ndtset 1
-#jdtset 4 
+ndtset 1
+jdtset 4 
 
 # This is for the MPI-parallelization of the SCF + NSCF steps.
 # For optimal efficiency the number of MPI procs should be a multiple of the number of k-points nkpt.
@@ -81,6 +81,7 @@ nband4     1024     # Bands to be used in the Self-Energy calculation
 ecutsigx4   45.0    # Dimension of the G sum in Sigma_x. 
 
 nkptgw4      3       # number of k-point where to calculate the GW correction
+kptgw4
             0.0  0.0  0.0 # Gamma point
             0.5  0.5  0.0 # X
             0.5 0.0 0.0   # L
