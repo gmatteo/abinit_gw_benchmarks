@@ -35,6 +35,9 @@ then run the code by using e.g.:
 
 Four Megabytes per CPU should be enough for this system.
 
+Reference output files are available in `screening_refs` and `sigma_refs` but I don't expect the numerical
+results to be stable as the WFK is not converged.
+
 ### MPI-parallelism in the SCF + NSCF part.
 
 I've designed the input file so that one can execute this part on an arbitrary number of MPI procs.
