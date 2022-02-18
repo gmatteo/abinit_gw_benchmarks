@@ -8,12 +8,12 @@
 
 # Uncomment the two lines below to perform the first two steps (SCF + NSCF)
 # This part is parallelized over nkpt 
-#ndtset 2
-#jdtset 1 2  
+ndtset 2
+jdtset 1 2  
 
 # Uncomment the two lines below to perform the third step (Screening)
-ndtset 1
-jdtset 3    
+#ndtset 1
+#jdtset 3    
 
 # Uncomment the two lines below to perform the fourth step (sigma)
 #ndtset 1
@@ -21,16 +21,18 @@ jdtset 3
 
 # This is for the MPI-parallelization of the SCF + NSCF steps.
 # For optimal efficiency the number of MPI procs should be a multiple of the number of k-points nkpt.
-# but this quantity depends on ngkpt specified below.
+# but this quantity depends on the value ngkpt specified below.
+#
 paral_kgb 1
 autoparal 1
 
 # Definition of the k-point grid for electrons.
-# Rougly speaking, GW computations scale with N_k^3 with N_k the total number of points in the mesh.
+# Roughly speaking, GW computations scale with N_k^3 with N_k the total number of points in the mesh.
 # All the four steps must be done with the same value of ngkpt
-# Here I use even divisions so that I can run the last step without having to change kptgw.
+# Here I use even divisions so that I can run the sigma part without having to change kptgw.
+#
 ngkpt   8 8 8    # nkpt 29
-#ngkpt  12 12 12
+#ngkpt  12 12 12   # nkpt 72 
 nshiftk 1
 shiftk  0.0 0.0 0.0  
 
@@ -57,7 +59,7 @@ nstep2      1       # Trick to reduce the number of steps in the NSCF solver.
 ############
 # Calculation of the screening 
 # Note that nband3 cannot be greater than nband2
-# For optimal load balance (nband3 - nelect/2) should be divisible by nprocs
+# For optimal load balance, nband3 - nelect/2 should be divisible by nprocs
 #
 optdriver3  3      # Screening calculation
 getwfk3     2      # Obtain WFK file from previous dataset
@@ -69,8 +71,9 @@ ecuteps3    8      # Cut-off energy of the planewave set to represent the dielec
 # Dataset 4
 ############
 # Calculation of the Self-Energy matrix elements (GW corrections)
-# nband4 cannot be greated than nband2
+# nband4 cannot be greater than nhand2
 # For optimal load balance nband4 should be divisible by nprocs
+#
 optdriver4  4       # Self-Energy calculation
 getwfk4     2       # Obtain WFK file from dataset 1
 getscr4     3       # Obtain SCR file from previous dataset
