@@ -1,0 +1,139 @@
+# Crystalline Zr2Y2O7, C1 structure (refer to green-x library for more information)
+# Calculation of the GW corrections
+# Dataset 1: ground state calculation to get the density
+# Dataset 2: NSCF run to produce the WFK file
+# Dataset 3: calculation of the screening (epsilon^-1 matrix for W)
+# Dataset 4: calculation of the Self-Energy matrix elements (GW corrections)
+
+
+# Uncomment the two lines below to perform the first two steps (SCF + NSCF)
+# This part is parallelized over nkpt 
+ndtset 2
+jdtset 1 2  
+
+# Uncomment the two lines below to perform the third step (Screening)
+#ndtset 1
+#jdtset 3    
+
+# Uncomment the two lines below to perform the fourth step (sigma)
+#ndtset 1
+#jdtset 4 
+
+# This is for the MPI-parallelization of the SCF + NSCF steps.
+# For optimal efficiency the number of MPI procs should be a multiple of the number of k-points nkpt.
+# but this quantity depends on the value ngkpt specified below.
+#
+paral_kgb 1
+autoparal 1
+
+# Definition of the k-point grid
+# Definition of the k-point grid for electrons.
+# Roughly speaking, GW computations scale with N_k^3 with N_k the total number of points in the mesh.
+# All the four steps must be done with the same value of ngkpt
+# Here I use even divisions so that I can run the sigma part without having to change kptgw.
+ngkpt   4 4 4
+nshiftk 1
+shiftk  0.0 0.0 0.0  # These shifts will be the same for all grids
+
+############
+# Dataset 1
+############
+# SCF-GS run
+nband1  288
+tolvrs1 1.0e-8
+
+############
+# Dataset 2
+############
+# Definition of parameters for the calculation of the WFK file
+nband2     2000       # Number of (occ and empty) bands to be computed
+#nbdbuf2     20       # Do not apply the convergence criterium to the last 20 bands (faster)
+iscf2       -2
+getden2    1
+tolwfr2  1.0d-18     # Will stop when this tolerance is achieved
+nstep2      1        # Trick to reduce the number of steps in the NSCF solver.
+                     # Final results won't be physical but we don't waste time in dataset 2
+
+############
+# Dataset 3
+############
+# Calculation of the screening (epsilon^-1 matrix)
+# Calculation of the screening 
+# Note that nband3 cannot be greater than nband2
+# For optimal load balance, nband3 - nelect/2 should be divisible by nprocs
+
+optdriver3  3        # Screening calculation
+getwfk3    2         # Obtain WFK file from previous dataset
+nband3     2000      # Bands to be used in the screening calculation
+ecuteps3    8        # Cut-off energy of the planewave set to represent the dielectric matrix.
+                     # This value has a **big impact** on cpu-time and memory.
+#nqptdm 1
+#qptdm 
+#0 0 0 
+
+############
+# Dataset 4
+############
+# Calculation of the Self-Energy matrix elements (GW corrections)
+# nband4 cannot be greater than nhand2
+# For optimal load balance nband4 should be divisible by nprocs
+
+optdriver4  4        # Self-Energy calculation
+getwfk4     2        # Obtain WFK file from dataset 1
+getscr4     3        # Obtain SCR file from previous dataset
+nband4      2000     # Bands to be used in the Self-Energy calculation
+ecutsigx4   25.0     # Dimension of the G sum in Sigma_x.
+                     # (the dimension in Sigma_c is controlled by ecuteps)
+
+nkptgw4      4       # number of k-point where to calculate the GW correction
+kptgw4               # k-points in reduced coordinates
+     0.0  0.0  0.0   #gamma
+     0.5  0.0  0.0
+     0.5  0.5  0.0
+     0.5  0.5  0.5
+
+bdgw4
+44 45
+44 45
+44 45
+44 45
+
+#Definition of the unit cell
+acell 5.1710519791 5.2522583008 5.3729929924 Angstrom
+angdeg 90 90 90
+
+#Definition of the atom types
+ntypat 3
+znucl 40 39 8
+
+
+#Definition of the atoms
+natom 11
+typat 1 1 2 2 3 3 3 3 3 3 3
+ xred
+     0.042915780         0.985388339         0.991757333
+     0.052825879         0.437198758         0.525285780
+     0.497849315         0.475347221         0.021504009
+     0.490855515         0.976347566         0.462963104
+     0.225142926         0.214346603         0.246291488
+     0.299171805         0.212877989         0.738681316
+     0.201778352         0.719375074         0.271586001
+     0.210239202         0.723023653         0.756618977
+     0.706459701         0.368427306         0.368842334
+     0.831742406         0.281842589         0.827464461
+     0.691019058         0.855824888         0.088167548
+
+istwfk  *1         # This is mandatory in all the GW steps.
+
+
+#Definition of the planewave basis set
+ecut 45.0         # Maximal kinetic energy cut-off, in Hartree
+
+#Definition of the SCF procedure
+nstep 150          # Maximal number of SCF cycles
+diemac 12.0
+timopt -1
+
+
+pseudos = "./Zr-sp.psp8, ./Y-sp.psp8, ./O.psp8"
+
