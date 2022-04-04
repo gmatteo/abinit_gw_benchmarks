@@ -67,10 +67,11 @@ nband3     2000      # Bands to be used in the screening calculation
 ecuteps3    8        # Cut-off energy of the planewave set to represent the dielectric matrix.
                      # This value has a **big impact** on cpu-time and memory.
                      #
-# Here one can select a subset of q-points. 
+# @Brian
+# Here one can select a subset of q-points for the Screening part. 
 # nqptdm specifies the number of q-points to compute
 # The SCR file won't be complete thus it's not possible to use it to perform the last step.
-# if nqptdm is not specifies, all q-points (36) are computed
+# If nqptdm is not specified i.e. nqptdm is commmented out, all q-points (36) are computed
 nqptdm 4
 qptdm 
 0.00000000E+00  0.00000000E+00  0.00000000E+00   #  1)     

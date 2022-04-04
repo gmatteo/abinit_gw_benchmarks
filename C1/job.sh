@@ -11,4 +11,5 @@
 
 source ~/git_repos/abinit/_build_gnu/modules.sh
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
-srun abinit run.abi  > run.log 2> run.err
+srun abinit_bad_scaling run.abi > bad.log 2> run.err
+srun abinit run.abi > run.log 2> run.err
